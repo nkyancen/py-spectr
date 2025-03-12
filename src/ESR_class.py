@@ -24,11 +24,11 @@ class ESR_Spectr: # класс для чтения исходников, выв�
         self.__int_res = []
     
     
-    def open_spectr(self, file_spectr): # открываем двоичный файл со спектром
-        self.file_sp, = file_spectr
-        extention = self.file_sp.split('.')[-1]
-        if extention == 'spe':
-            A = np.memmap(file_spectr[0], np.uint16, 'r')
+    def open_spectr(self, file_spectra): # открываем двоичный файл со спектром
+        self.file_sp, = file_spectra
+        extension = self.file_sp.split('.')[-1]
+        if extension == 'spe':
+            A = np.memmap(file_spectra[0], np.uint16, 'r')
         
             a = A[4106:4136:5]
 
@@ -47,8 +47,8 @@ class ESR_Spectr: # класс для чтения исходников, выв�
             self.__gain = (gain_value * np.power(10, gain_order)) * np.power(10, - power_attenuation/20) * modulation_amplitude
             self.intensity = (A[5:4100].astype('float32') - 16380) / self.__gain
             
-        elif extention == 'txt' or 'dat':
-            data = np.genfromtxt(file_spectr[0], skip_header = 1).reshape(8190, order = 'F')
+        elif extension == 'txt' or 'dat':
+            data = np.genfromtxt(file_spectra[0], skip_header = 1).reshape(8190, order ='F')
             
             self.field = data[:4095].reshape(4095)
             self.intensity = data[4095:].reshape(4095)
@@ -64,7 +64,7 @@ class ESR_Spectr: # класс для чтения исходников, выв�
             self.__h_res.append((self.h_pp[-1] + self.h_pp[-2]) / 2)
             self.__dh_res.append(np.sqrt(3)*np.abs(self.h_pp[-1] - self.h_pp[-2]))
             self.__int_res.append(2 / 3 * np.abs(self.int_pp[-1] - self.int_pp[-2]) * np.abs(self.h_pp[-1] - self.h_pp[-2]))
-        elif len(self.h_pp) // 2 < len(self.__h_res): # удаляем параметры резонанскной линии с конца списка при удалении пика на графике
+        elif len(self.h_pp) // 2 < len(self.__h_res): # удаляем параметры резонансной линии с конца списка при удалении пика на графике
             del self.__n_modes[-1]
             del self.__h_res[-1]
             del self.__dh_res[-1]
@@ -105,7 +105,7 @@ class ESR_Normal_Spectr: # класс для нормализации спект
         del self.intens[:]
         # ~ if hmin > hmax:
             # ~ hmin, hmax = hmax, hmin
-        for i in range(len(spectr.field)): # определям границы нормализации
+        for i in range(len(spectr.field)): # определяем границы нормализации
             if spectr.field[i] >= spectr.begin_norm and spectr.field[i] <= spectr.end_norm:
                 self.field.append(spectr.field[i])
                 self.intens.append(spectr.intensity[i])
@@ -113,7 +113,7 @@ class ESR_Normal_Spectr: # класс для нормализации спект
         self.koef_normalize = (max(self.intens) - min(self.intens)) / 2
         
         min_int = min(self.intens)
-        for i in range(len(self.field)): #нормализуем спектр
+        for i in range(len(self.field)): # нормализуем спектр
             self.field[i] = self.field[i] / self.center_field - 1
             self.intens[i] = (self.intens[i] - min_int) / self.koef_normalize - 1
         
