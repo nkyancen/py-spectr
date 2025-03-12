@@ -23,7 +23,7 @@ line2 = Lorenz_Line()
 
 def split_spectr(main_win, base_spectr): #производное окно с нормализованным спектром
     if base_spectr.file_sp == '':
-        tkbox.showwarning('Ошибка','Сначала выберите спектр ', parent = main_win)
+        tkbox.showwarning('Ошибка','Сначала выберите спектр!', parent = main_win)
         return
 
     norm_fig = Figure(figsize = (6, 5.5), dpi = 100)
