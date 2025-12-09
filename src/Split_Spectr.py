@@ -106,7 +106,7 @@ def split_spectr(main_win, base_spectr): #производное окно с н�
                                height = 2,
                                text = ' до ')
 
-    font = ('Times', 13)
+    font = ('', 12)
 
     hmin_spinbox = tk.Spinbox(field_frame,
                       width = 14,
