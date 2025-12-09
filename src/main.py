@@ -159,7 +159,7 @@ main_canvas.get_tk_widget().pack(padx =  10, fill = tk.X)
 # in main window
 frame_button.pack(padx = 250, side = 'left')
 plot_open_button.pack(side = 'left')
-plot_export_button.pack(side = 'left', padx = [50,50], ipady = 2)
+plot_export_button.pack(side = 'left', padx = 50, ipady = 2)
 export_param_button.pack(side = 'left')
 split_spectr_button.pack(side = 'left', padx = 50)
 

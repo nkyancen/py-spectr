@@ -43,7 +43,7 @@ class ESR_Spectr: # класс для чтения исходников, выв�
             gain_value = param[4]
             gain_order = param[5]
             
-            self.field = np.arange(central_field - spread_field / 2, central_field + spread_field / 2, spread_field / 4095)
+            self.field = np.arange(central_field - spread_field / 2, central_field + spread_field / 2, spread_field / 4095)[:4095]
             self.__gain = (gain_value * np.power(10, gain_order)) * np.power(10, - power_attenuation/20) * modulation_amplitude
             self.intensity = (A[5:4100].astype('float32') - 16380) / self.__gain
             
@@ -72,20 +72,20 @@ class ESR_Spectr: # класс для чтения исходников, выв�
     
     
     def export(self): # экспорт спектра в data-файл
-        ex_data = '   H, Oe         I \n'
+        ex_data = '   H, Oe      |     I \n----------------------------\n'
         for i in range(len(self.field)):
-            ex_data += f'{self.field[i]:.6f}    {self.intensity[i]:.6f} \n'
+            ex_data += f' {self.field[i]:.6f}  |  {self.intensity[i]:.6f} \n'
         
         with open(self.file_sp.split('.')[0] + '_спектр.dat', 'w', encoding = 'utf8') as export_file:
                 print(ex_data, file = export_file)
 
 
     def export_parameters(self):  # экспорт параметров резонансных линий в data-файл
-        param_data = ' n   H, Oe       g     dH, Oe     I_n       I_n/I_0\n'
+        param_data = ' n | H, Oe    |   g   |  2dH, Oe  |   I_n     | I_n/I_0\n---------------------------------------------------------\n'
         for i in range(self.__n_modes[-1] + 1):
-            param_data += f'{self.__n_modes[i]:2d}   {self.__h_res[i]:.3f}  {1069.795 / self.__h_res[i]:.3f}   {self.__dh_res[i]:.3f}    {self.__int_res[i]:.3e}     {self.__int_res[i] / self.__int_res[0]:.3f}\n'
+            param_data += f'{self.__n_modes[i]:2d} | {self.__h_res[i]:.3f} | {1069.795 / self.__h_res[i]:.3f} |   {self.__dh_res[i]:.3f}  | {self.__int_res[i]:.3e} | {self.__int_res[i] / self.__int_res[0]:.3f}\n'
             
-        with open(self.file_sp.split('.')[0] + '_парметры.dat', 'w', encoding = 'utf8') as export_file:
+        with open(self.file_sp.split('.')[0] + '_параметры.dat', 'w', encoding = 'utf8') as export_file:
                 print(param_data, file = export_file)    
 
 
@@ -146,7 +146,8 @@ class Lorenz_Line:
         dHpp = self.x_pp * norm_sp.center_field
         dH = dHpp * np.power(3, 1/2)
         H0 = (self.center + 1) * norm_sp.center_field
+        g = 1069.795 / H0
         Ipp = 2 * self.int_deriv * norm_sp.koef_normalize
         Im = 2/3 * Ipp * dHpp
-        return (H0, dHpp, Ipp, dH, Im)
+        return (H0, dHpp, Ipp, g, dH, Im)
     
