@@ -22,10 +22,15 @@ class ESR_Spectr: # класс для чтения исходников, выв�
         self.__h_res = []
         self.__dh_res = []   
         self.__int_res = []
-    
-    
+
     def open_spectr(self, file_spectra): # открываем двоичный файл со спектром
         self.file_sp, = file_spectra
+
+        self.h_pp = []
+        self.int_pp = []
+        self.begin_norm = 0.0
+        self.end_norm = 0.0
+
         extension = self.file_sp.split('.')[-1]
         if extension == 'spe':
             A = np.memmap(file_spectra[0], np.uint16, 'r')
@@ -81,9 +86,9 @@ class ESR_Spectr: # класс для чтения исходников, выв�
 
 
     def export_parameters(self):  # экспорт параметров резонансных линий в data-файл
-        param_data = ' n | H, Oe    |   g   |  2dH, Oe  |   I_n     | I_n/I_0\n---------------------------------------------------------\n'
+        param_data = ' n | H, Oe    |   g   |  2dH, Oe  |    I_n    | I_n/I_0\n---------------------------------------------------------\n'
         for i in range(self.__n_modes[-1] + 1):
-            param_data += f'{self.__n_modes[i]:2d} | {self.__h_res[i]:.3f} | {1069.795 / self.__h_res[i]:.3f} |   {self.__dh_res[i]:.3f}  | {self.__int_res[i]:.3e} | {self.__int_res[i] / self.__int_res[0]:.3f}\n'
+            param_data += f'{self.__n_modes[i]:2d} | {self.__h_res[i]:.3f} | { 6716.194 / self.__h_res[i]:.3f} |   {self.__dh_res[i]:.3f}  | {self.__int_res[i]:.3e} | {self.__int_res[i] / self.__int_res[0]:.3f}\n'
             
         with open(self.file_sp.split('.')[0] + '_параметры.dat', 'w', encoding = 'utf8') as export_file:
                 print(param_data, file = export_file)    
@@ -138,15 +143,13 @@ class Lorenz_Line:
         self.recalc() # пересчитываем коэффициенты
         for i in range(len(x)):
             self.y[i] = 2 * self.__ampl * self.__b * (x[i] - self.center) / np.power(1 + self.__b * np.power(x[i] - self.center, 2), 2)
-            # ~ self.y.append(2 * self.__ampl * self.__b * (x[i] - self.center) / np.power(1 + self.__b * np.power(x[i] - self.center, 2), 2))
-        # ~ return self.y
     
     def get_parameters(self, norm_sp):
         # ~ param_data = f' H_0, Oe      Im     2DH, Oe\n '
         dHpp = self.x_pp * norm_sp.center_field
         dH = dHpp * np.power(3, 1/2)
         H0 = (self.center + 1) * norm_sp.center_field
-        g = 1069.795 / H0
+        g = 6716.194 / H0
         Ipp = 2 * self.int_deriv * norm_sp.koef_normalize
         Im = 2/3 * Ipp * dHpp
         return (H0, dHpp, Ipp, g, dH, Im)
